@@ -183,9 +183,14 @@ expRun <- function(config, casestudy, generator) {
 	res <- spot(spotConfig=config, casestudy=casestudy, generator=generator)
 
 	# save the results to a file
-	directory = paste0("spot/results/", DATABASE, "/")
-	filename = paste(casestudy, generator, config$auto.loop.nevals, sep="-")
-	save(res, file=paste0(directory, filename, ".RData"))
+	outputDir <- paste0("spot/results/", DATABASE, "/")
+	filename <- paste(casestudy, generator, config$auto.loop.nevals, sep="-")
+	filePath <- paste0(outputDir, filename, ".RData")
+	# ensure that the output directory exists; if not, create it
+	if (file.exists(outputDir) || dir.create(outputDir, recursive=TRUE))
+		save(res, file=filePath)
+	else # in this case, the directory doesn't exist and we failed to create it
+		print(paste0("Error: Unable to save results to '",filePath,"'."))
 
 	return(res)
 }

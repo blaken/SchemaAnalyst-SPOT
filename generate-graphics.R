@@ -29,9 +29,9 @@ require(reshape) # used to restructure data for use with ggplot2
 generateGraphics <- function(resultsDirectory) {
 	# create an output directory
 	outputDir = paste0(resultsDirectory,"visualizations/")
-	if (!dir.create(outputDir)) {
-		print(paste0("Error: Could not create output directory ",outputDir,".");
-		return; # give up--we have nowhere to store output
+	if (!file.exists(outputDir) && !dir.create(outputDir)) {
+		# give up--we have nowhere to store output
+		stop(paste0("Error: Could not create output directory '",outputDir,"'."))
 	}
 
 	# store all importance values in order to analyze later
@@ -48,7 +48,7 @@ generateGraphics <- function(resultsDirectory) {
 			next # that is, continue to the next fileName
 
 		# load the result set from this file
-		print(paste0("Loading ", fileName, "..."))
+		print(paste0("Loading ", fileName, "."))
 		load(paste0(resultsDirectory,fileName))
 
 		# abbreviate the current result reference
@@ -85,7 +85,7 @@ generateGraphics <- function(resultsDirectory) {
 		# Generate classification tree. Leave out RandomSeed from this to prevent unwanted breaks.
 		mutScoreFit <- rpart(MutationScore ~ SatisfyRows + NegateRows + RandomProfile, data=curRes)
 
-		postscript(file=paste0(outBaseName,"-MutScore-ClassTree.ps")) # output to postscript
+		postscript(file=paste0(outputDir,outBaseName,"-MutScore-ClassTree.ps")) # output to postscript
 		plot(mutScoreFit, uniform=FALSE, main="SchemaAnalyst Parameters Classification Tree",
 			sub=paste0("Schema: ",schemaName,", Generator: ", generatorName))
 		text(mutScoreFit, use.n=TRUE, all=TRUE, cex=.8)
@@ -94,23 +94,25 @@ generateGraphics <- function(resultsDirectory) {
 		# Generate conditional inference tree. Leave out RandomSeed from this to prevent unwanted breaks.
 		mutScoreFit <- ctree(MutationScore ~ SatisfyRows + NegateRows + RandomProfile, data=curRes)
 
-		postscript(file=paste0(outBaseName,"-MutScore-CondInfTree.ps")) # output to a postscript
+		postscript(file=paste0(outputDir,outBaseName,"-MutScore-CondInfTree.ps")) # output to a postscript
 		plot(mutScoreFit, main="SchemaAnalyst Parameters Conditional Inference Tree",
 			sub=paste0("Schema: ",schemaName,", Generator: ", generatorName))
 		dev.off() # close open PS file
 	}
 
+	print(paste0("Saving generated visualizations to '",outputDir,"'."))
+
 	# provide collected data related to parameter importance on mutation score
-	plot <- qplot(variable, value, data=melt(mutScoreImportances), geom="boxplot", colour=variable, legend=FALSE)
-			+ xlab("Parameter") + ylab("Importance on Mutation Score") # add axis labels
-			+ theme(legend.position="none") # hide the graph legend
-			+ labs(title=paste0("Parameter Importance on Mutation Score\n",length(genTimeImportances)," Schemas"))
-	ggsave(filename=paste0(outputPath,"mutation-score-importance.ps"))
+	plot <- qplot(variable, value, data=melt(mutScoreImportances), geom="boxplot", colour=variable, legend=FALSE) +
+				xlab("Parameter") + ylab("Importance on Mutation Score") + # add axis labels
+				theme(legend.position="none") + # hide the graph legend
+				labs(title=paste0("Parameter Importance on Mutation Score\n",length(genTimeImportances)," Schemas"))
+	ggsave(filename=paste0(outputDir,"mutation-score-importance.ps"))
 
 	# provide collected data related to parameter importance on generation time
-	plot <- qplot(variable, value, data=melt(genTimeImportances), geom="boxplot", colour=variable)
-			+ xlab("Parameter") + ylab("Importance on Generation Time") # add axis labels
-			+ theme(legend.position="none") # hide the graph legend
-			+ labs(title=paste0("Parameter Importance on Generation Time\n",length(genTimeImportances)," Schemas"))
-	ggsave(filename=paste0(outputPath,"generation-time-importance.ps"))
+	plot <- qplot(variable, value, data=melt(genTimeImportances), geom="boxplot", colour=variable) +
+				xlab("Parameter") + ylab("Importance on Generation Time") + # add axis labels
+				theme(legend.position="none") + # hide the graph legend
+				labs(title=paste0("Parameter Importance on Generation Time\n",length(genTimeImportances)," Schemas"))
+	ggsave(filename=paste0(outputDir,"generation-time-importance.ps"))
 }

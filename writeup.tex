@@ -1,0 +1,83 @@
+\documentclass[a4paper]{article}
+
+\usepackage[english]{babel}
+\usepackage[utf8x]{inputenc}
+\usepackage{amsmath}
+\usepackage{graphicx}
+\usepackage[colorinlistoftodos]{todonotes}
+
+\title{Parameter Optimization in SchemaAnalyst}
+\author{Nathaniel Blake \and Colin Soleim }
+
+\begin{document}
+\maketitle
+
+\section{Introduction}
+
+The parameters of a system can play a large role in every aspect of its performance, but they are often set or changed based only on loose testing. Parameter optimization is an attempt to create an experiment to look through a more complete list of possible configurations and accordingly tune a system. The method of sequential parameter optimization has been a popular framework to use since its introduction by Bartz-Beielstein in 2006. Shortly after his initial paper was published, he followed up with a package for R known as the Sequential Parameter Optimization Toolbox or SPOT. This can be found on the Complete R Archive Network website at http://cran.r-project.org/web/packages/SPOT/index.html. 
+
+Our experiment uses this R package to test the parameters of a new system created by Kapfhammer, McMinn, and Wright known as SchemaAnalyst which is built for schema testing. The tool works like this
+
+The four key parameters in SchemaAnalyst are satisfyrows, negaterows, randomprofile, and maxevaluations. These correspond to 
+
+To test the parameters of SchemaAnalyst, we compiled a list of 20 schemas with varying number of constraints and complexity. We ran SPOT with each of these schemas while varying the parameters as stated above. For our performance metric, we created a function that output the expression $ \big( 1 - \frac{\text{Number of Mutants Killed}}{\text{Number of Mutants Created}} \big). $
+
+The results of our experiment revealed that 
+
+Therefore the contributions of this experiment are:
+
+\begin{enumerate}
+\item
+\item
+\item
+\end{enumerate}
+
+\section{SPOT}
+
+TODO: Description of how SPOT works
+
+\section{SchemaAnalyst}
+
+TODO: Full Description of how SchemaAnalyst works
+
+\section{Description of our Source Code}
+
+TODO
+
+\section{Visualizations of Results}
+
+TODO
+
+\end{document}
+
+@inproceedings{DBLP:conf/hm/Bartz-BeielsteinPR06,
+  author    = {Thomas Bartz-Beielstein and
+               Mike Preuss and
+               G{\"u}nter Rudolph},
+  title     = {Investigation of One-Go Evolution Strategy/Quasi-Newton
+               Hybridizations},
+  booktitle = {Hybrid Metaheuristics},
+  year      = {2006},
+  pages     = {178-191},
+  ee        = {http://dx.doi.org/10.1007/11890584_14},
+  crossref  = {DBLP:conf/hm/2006},
+  bibsource = {DBLP, http://dblp.uni-trier.de}
+}
+@proceedings{DBLP:conf/hm/2006,
+  editor    = {Francisco Almeida and
+               Mar\'{\i}a J. Blesa Aguilera and
+               Christian Blum and
+               J. Marcos Moreno-Vega and
+               Melqu\'{\i}ades P{\'e}rez P{\'e}rez and
+               Andrea Roli and
+               Michael Sampels},
+  title     = {Hybrid Metaheuristics, Third International Workshop, HM
+               2006, Gran Canaria, Spain, October 13-15, 2006, Proceedings},
+  booktitle = {Hybrid Metaheuristics},
+  publisher = {Springer},
+  series    = {Lecture Notes in Computer Science},
+  volume    = {4030},
+  year      = {2006},
+  isbn      = {3-540-46384-4},
+  bibsource = {DBLP, http://dblp.uni-trier.de}
+}

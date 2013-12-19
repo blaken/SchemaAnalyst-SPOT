@@ -8,7 +8,7 @@
 # Note: It is expected that this code will be run from the 
 # project directory root for SchemaAnalyst. From here, the 
 # visualization function can be loaded by running
-# source("spot/experiment.R")
+# source("spot/generate-graphics.R")
 #
 # Next, the visualizations can be generated for a set of
 # result files by running
@@ -16,6 +16,7 @@
 #
 # All generated visualizations will be stored in the above path
 # in a visualizations/ subdirectory.
+# --------------------------------------------------------------
 #
 # Author: Nathaniel Blake, Allegheny College
 #####################################################################
@@ -37,9 +38,7 @@ generateGraphics <- function(resultsDirectory) {
 	# store all importance values in order to analyze later
 	# TODO: prevent the row of NAs that this initialization causes
 	mutScoreImportances = as.data.frame(matrix(ncol = 4))
-	colnames(mutScoreImportances) <- c("SatisfyRows", "NegateRows", "RandomProfile", "RandomSeed")
 	genTimeImportances = as.data.frame(matrix(ncol = 4))
-	colnames(genTimeImportances) <- c("SatisfyRows", "NegateRows", "RandomProfile", "RandomSeed")
 
 	# iterate through the results files
 	for (fileName in list.files(resultsDirectory)) {
@@ -102,17 +101,27 @@ generateGraphics <- function(resultsDirectory) {
 
 	print(paste0("Saving generated visualizations to '",outputDir,"'."))
 
+	# strip NA values from the importances data frames, but only if there are more than
+	# two rows; otherwise, we cannot assign column labels
+	if ( (nrow(mutScoreImportances) > 2) && (nrow(genTimeImportances) > 2) ) {
+		mutScoreImportances <- mutScoreImportances[!is.na(mutScoreImportances)]
+		genTimeImportances <- genTimeImportances[!is.na(genTimeImportances)]
+	}
+	# add column labels
+	colnames(mutScoreImportances) <- c("SatisfyRows", "NegateRows", "RandomProfile", "RandomSeed")
+	colnames(genTimeImportances) <- c("SatisfyRows", "NegateRows", "RandomProfile", "RandomSeed")
+
 	# provide collected data related to parameter importance on mutation score
 	plot <- qplot(variable, value, data=melt(mutScoreImportances), geom="boxplot", colour=variable, legend=FALSE) +
 				xlab("Parameter") + ylab("Importance on Mutation Score") + # add axis labels
 				theme(legend.position="none") + # hide the graph legend
-				labs(title=paste0("Parameter Importance on Mutation Score\n",length(genTimeImportances)," Schemas"))
+				labs(title=paste0("Parameter Importance on Mutation Score\n",nrow(mutScoreImportances)," Schemas"))
 	ggsave(filename=paste0(outputDir,"mutation-score-importance.ps"))
 
 	# provide collected data related to parameter importance on generation time
 	plot <- qplot(variable, value, data=melt(genTimeImportances), geom="boxplot", colour=variable) +
 				xlab("Parameter") + ylab("Importance on Generation Time") + # add axis labels
 				theme(legend.position="none") + # hide the graph legend
-				labs(title=paste0("Parameter Importance on Generation Time\n",length(genTimeImportances)," Schemas"))
+				labs(title=paste0("Parameter Importance on Generation Time\n",nrow(genTimeImportances)," Schemas"))
 	ggsave(filename=paste0(outputDir,"generation-time-importance.ps"))
 }

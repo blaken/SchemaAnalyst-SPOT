@@ -38,13 +38,20 @@
 # file in the spot/results/{DB_NAME}/ directory.
 #
 # ---- Usage:---------------------------------------------------
+# Note: It is expected that this code will be run from the 
+# project directory root for SchemaAnalyst; otherwise, there 
+# will be classpath issues. From here, the functions can
+# be loaded by running
+# source("spot/experiment.R")
+#
+# An experiment can be configured and run with the following:
 # config <- expConfig(numEvaluations, useGenerationTime)
 # res <- expRun(config, "{SCHEMA_NAME}", "{GENERATOR}")
 #
 # To see the best determined parameter configurations, print
 # res$alg.currentBest
 #
-# To see all configurations, print
+# To see all tested configurations, print
 # res$alg.currentResult
 #
 # Saved results can be loaded in the current R session with
@@ -123,7 +130,7 @@ expConfig <- function(numEvals, useGenerationTime=FALSE) {
 
 		if (useGenerationTime) {
 			# read in the generation execution time
-			generationCosts <- read.csv("generationCosts.dat")
+			generationCosts <- read.csv("spot/generationCosts.dat")
 			genExecTime <- tail(generationCosts$timetaken, n=1)
 
 			# this line will return a multi-variable optimization target that includes
@@ -156,7 +163,7 @@ expConfig <- function(numEvals, useGenerationTime=FALSE) {
 				# number of runs per parameter configuration--
 				# 1 works efficiently since this is deterministic
 				init.design.repeats = 1,
-				spot.filemode = TRUE,
+				spot.filemode = FALSE,
 				seq.predictionModel.func = "spotPredictRandomForest",
 				spot.seed=123,
 				spot.ocba=FALSE

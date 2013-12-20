@@ -1,15 +1,17 @@
-\documentclass[a4paper]{article}
+\documentclass[a4paper,twocolumn]{article}
 
-\usepackage[english]{babel}
+\usepackage{cite}
 \usepackage[utf8x]{inputenc}
 \usepackage{amsmath}
 \usepackage{graphicx}
 \usepackage[colorinlistoftodos]{todonotes}
 
-\title{Parameter Optimization in SchemaAnalyst}
-\author{Nathaniel Blake \and Colin Soleim }
+\title{Optimizing SchemaAnalyst Parameter Usage with \texttt{SPOT}}
+\author{Nathaniel Blake \\ \textit{Department of Computer Science} \\ \textit{Allegheny College} \and Colin Soleim \\ \textit{Department of Computer Science} \\ \textit{Allegheny College}}
+\date{}
 
 \begin{document}
+
 \maketitle
 
 \section{Introduction}
@@ -32,52 +34,39 @@ Therefore the contributions of this experiment are:
 \item
 \end{enumerate}
 
-\section{SPOT}
+\section{SPOT} \label{sec:SPOT}
 
 TODO: Description of how SPOT works
 
-\section{SchemaAnalyst}
+\section{SchemaAnalyst} \label{sec:schemaanalyst}
 
 TODO: Full Description of how SchemaAnalyst works
 
-\section{Description of our Source Code}
+\section{Description of Experiment Design} \label{sec:exp-des}
 
-TODO
+The core experiment in our research follows the standard use model for SchemaAnalyst, beginning with $(1)$ generation of a set $D$ of database interactions that either satisfy or negate a provided schema $S$ and then $(2)$ running mutation analysis in which the interactions in $D$ are used to try to kill a series of mutant schemas, $S'_1, \dots, S'_n$.
 
-\section{Visualizations of Results}
+In particular, our \texttt{experiment.R} code uses \texttt{SPOT} to generate parameter designs that include the following four parameters:
+\begin{enumerate}
+\item \texttt{satisfyrows}, the number of database interactions that satisfy the original schema's constraints,
+\item \texttt{negaterows}, the number of database interactions that violate the original schema's constraints in at least one way,
+\item \texttt{randomprofile}, a value of either \texttt{'large'} or \texttt{'small'} that determines the scope considered during AVM restarts, and
+\item \texttt{randomseed}, a number used to seed the AVM's decisions when using random restart, as well as the seed to the \texttt{Random} generator.
+\end{enumerate}
 
-TODO
+There are two important additional parameters to the generation phase that are not included in our usage of SPOT. The first, \texttt{datagenerator}, is specified by the user at the time of experiment configuration and determines the generator that is used for the entirety of the experiment run's evaluations. The other, \texttt{maxevaluations}, is statically set to an arbitrarily high value of $1,000,000$, since low values are sure to prevent the experiment from producing useful results (because generation will be terminated before the requested number of statements has been created) but higher values are only better to the extent that they do not prevent generation from terminating unnecessarily.
 
+Once \texttt{SPOT} has created a parameter configuration, SchemaAnalyst's \texttt{GenerateResultsFromGenerator} is executed with the provided parameters, and its execution time is measured as a secondary optimization target for \texttt{SPOT}. Once generation is complete, SchemaAnalyst's \texttt{Original} mutation analysis is used against the generated database interactions; \texttt{Original} was chosen because it provides the most comprehensive coverage of mutant types among available techniques, even though it is not as well optimized as others. Follow mutation analysis, the mutation score is recorded, and its inverse is provided to \texttt{SPOT} as the primary optimization target (we use its inverse, calculated as $1 - \frac{\text{Killed Mutants}}{\text{Total Mutants}}$ since \texttt{SPOT} always optimizes using minimization).
+
+From here, \texttt{SPOT} proceeds as described in Section~\ref{sec:SPOT} and in \cite{SPOT2005}, calculating the relative importance of each of the parameters using \texttt{RandomForest} prediction and optimizing its design accordingly over a number of evaluations defined during experiment configuration, storing the mutation score and generation time for each of the configurations that it has tried for later analysis.
+
+\section{Preliminary Analysis of Results}
+
+
+
+
+\bibliographystyle{acm}
+\bibliography{references}
 \end{document}
 
-@inproceedings{DBLP:conf/hm/Bartz-BeielsteinPR06,
-  author    = {Thomas Bartz-Beielstein and
-               Mike Preuss and
-               G{\"u}nter Rudolph},
-  title     = {Investigation of One-Go Evolution Strategy/Quasi-Newton
-               Hybridizations},
-  booktitle = {Hybrid Metaheuristics},
-  year      = {2006},
-  pages     = {178-191},
-  ee        = {http://dx.doi.org/10.1007/11890584_14},
-  crossref  = {DBLP:conf/hm/2006},
-  bibsource = {DBLP, http://dblp.uni-trier.de}
-}
-@proceedings{DBLP:conf/hm/2006,
-  editor    = {Francisco Almeida and
-               Mar\'{\i}a J. Blesa Aguilera and
-               Christian Blum and
-               J. Marcos Moreno-Vega and
-               Melqu\'{\i}ades P{\'e}rez P{\'e}rez and
-               Andrea Roli and
-               Michael Sampels},
-  title     = {Hybrid Metaheuristics, Third International Workshop, HM
-               2006, Gran Canaria, Spain, October 13-15, 2006, Proceedings},
-  booktitle = {Hybrid Metaheuristics},
-  publisher = {Springer},
-  series    = {Lecture Notes in Computer Science},
-  volume    = {4030},
-  year      = {2006},
-  isbn      = {3-540-46384-4},
-  bibsource = {DBLP, http://dblp.uni-trier.de}
-}
+

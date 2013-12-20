@@ -19,20 +19,18 @@
 
 The parameters of a system can play a large role in every aspect of its performance, but they are often set or changed based only on loose testing. Parameter optimization is an attempt to create an experiment to look through a more complete list of possible configurations and accordingly tune a system. The method of sequential parameter optimization has been a popular framework to use since its introduction by Bartz-Beielstein in 2006. Shortly after his initial paper was published, he followed up with a package for R known as the Sequential Parameter Optimization Toolbox or SPOT. This can be found on the Complete R Archive Network website at http://cran.r-project.org/web/packages/SPOT/index.html. 
 
-Our experiment uses this R package to test the parameters of a new system created by Kapfhammer, McMinn, and Wright known as SchemaAnalyst which is built for schema testing. The tool works like this
+Our experiment uses this R package to test the parameters of a new search-based testing system for relational schemas created by Kapfhammer, McMinn, and Wright known as SchemaAnalyst. This tool first takes in a database schema and converts it into a universal representation. Then, for each integrity constraint within the schema, SchemaAnalyst attempts to create one SQL INSERT statement to satisfy the constraint and one to negate the constraint. For each type of constraint, SchemaAnalyst calculates a distance metric based on how close a constraint is to being satisfied. This is used as the fitness function which is then minimized using the Alternating Variable Method. 
 
-The four key parameters in SchemaAnalyst are satisfyrows, negaterows, randomprofile, and maxevaluations. These correspond to 
+With the data generated, mutation analysis is performed to test the effectiveness of the data. Mutants are generated for each specific class of integrity constraint. This mutation analysis was our primary metric for testing the performance of different configurations of SchemaAnalyst. We created configurations for SchemaAnalyst based on four key parameters in SchemaAnalyst: satisfyrows, negaterows, randomprofile, and randomseed.
 
-To test the parameters of SchemaAnalyst, we compiled a list of 20 schemas with varying number of constraints and complexity. We ran SPOT with each of these schemas while varying the parameters as stated above. For our performance metric, we created a function that output the expression $ \big( 1 - \frac{\text{Number of Mutants Killed}}{\text{Number of Mutants Created}} \big). $
+The results of our experiment give definitive evidence that SchemaAnalyst mutation scores can be optimized by configuring parameters using SPOT. In all 8 schemas tested, our optimized configurations outperform the defaults that SchemaAnalyst currently uses. We show that by far the most important parameter is satisfyrows, with randomseed, negaterows, and randomprofile having second, third, and fourth priority respectively across all schemas tested. With this conclusive proof that our technique is effective, we will run a full suite of tests on the 44 schemas available in the repository to find results that apply generally to either all schemas or broad classes of schemas. 
 
-The results of our experiment revealed that 
-
-Therefore the contributions of this experiment are:
+The current empirical study that we have completed contributes:
 
 \begin{enumerate}
-\item
-\item
-\item
+\item a set of regression trees indicating what configuration settings are best for each schema,
+\item evidence that parameters optimized by SPOT perform better than the default configurations of SchemaAnalyst,
+\item an ordering of parameters by their importance in mutation analysis score.
 \end{enumerate}
 
 \section{SPOT} \label{sec:SPOT}
@@ -41,7 +39,7 @@ TODO: Description of how SPOT works
 
 \section{SchemaAnalyst} \label{sec:schemaanalyst}
 
-TODO: Full Description of how SchemaAnalyst works
+TODO: Full Description of how SchemaAnalyst works. QUESTION: How long should this section be? How much of the detail from the ICST paper would be appropriate for this new paper? 
 
 \section{Description of Experiment Design} \label{sec:exp-des}
 
@@ -57,7 +55,7 @@ In particular, our \texttt{experiment.R} code uses \texttt{SPOT} to generate par
 
 There are two important additional parameters to the generation phase that are not included in our usage of SPOT. The first, \texttt{datagenerator}, is specified by the user at the time of experiment configuration and determines the generator that is used for the entirety of the experiment run's evaluations. The other, \texttt{maxevaluations}, is statically set to an arbitrarily high value of $1,000,000$, since low values are sure to prevent the experiment from producing useful results (because generation will be terminated before the requested number of statements has been created) but higher values are only better to the extent that they do not prevent generation from terminating unnecessarily.
 
-Once \texttt{SPOT} has created a parameter configuration, SchemaAnalyst's \texttt{GenerateResultsFromGenerator} is executed with the provided parameters, and its execution time is measured as a secondary optimization target for \texttt{SPOT}. Once generation is complete, SchemaAnalyst's \texttt{Original} mutation analysis is used against the generated database interactions; \texttt{Original} was chosen because it provides the most comprehensive coverage of mutant types among available techniques, even though it is not as well optimized as others. Follow mutation analysis, the mutation score is recorded, and its inverse is provided to \texttt{SPOT} as the primary optimization target (we use its inverse, calculated as $1 - \frac{\text{Killed Mutants}}{\text{Total Mutants}}$ since \texttt{SPOT} always optimizes using minimization).
+Once \texttt{SPOT} has created a parameter configuration, SchemaAnalyst's \texttt{GenerateResultsFromGenerator} is executed with the provided parameters, and its execution time is measured as a secondary optimization target for \texttt{SPOT}. Once generation is complete, SchemaAnalyst's \texttt{Original} mutation analysis is used against the generated database interactions; \texttt{Original} was chosen because it provides the most comprehensive coverage of mutant types among available techniques, even though it is not as well optimized as others. Following mutation analysis, the mutation score is recorded, and its inverse is provided to \texttt{SPOT} as the primary optimization target (we use its inverse, calculated as $1 - \frac{\text{Killed Mutants}}{\text{Total Mutants}}$ since \texttt{SPOT} always optimizes using minimization).
 
 From here, \texttt{SPOT} proceeds as described in Section~\ref{sec:SPOT} and in \cite{SPOT2005}, calculating the relative importance of each of the parameters using \texttt{RandomForest} prediction and optimizing its design accordingly over a number of evaluations defined during experiment configuration, storing the mutation score and generation time for each of the configurations that it has tried for later analysis.
 

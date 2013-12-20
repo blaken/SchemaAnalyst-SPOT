@@ -82,11 +82,11 @@ generateGraphics <- function(resultsDirectory) {
 		genTimeFit <- randomForest(GenerationTime ~ SatisfyRows + NegateRows + RandomProfile + RandomSeed, data=curRes)
 		genTimeImportances <- rbind(genTimeImportances, as.vector(importance(genTimeFit))) # add these values as a row to importances
 
-		# Generate classification tree. Leave out RandomSeed from this to prevent unwanted breaks.
+		# Generate regression tree. Leave out RandomSeed from this to prevent misleading branches. 
 		mutScoreFit <- rpart(MutationScore ~ SatisfyRows + NegateRows + RandomProfile, data=curRes)
 
-		pdf(file=paste0(outputDir,outBaseName,"-MutScore-ClassTree.pdf")) # output to PDF 
-		plot(mutScoreFit, uniform=FALSE, main="SchemaAnalyst Parameters Classification Tree",
+		pdf(file=paste0(outputDir,outBaseName,"-MutScore-RegressTree.pdf")) # output to PDF 
+		plot(mutScoreFit, uniform=FALSE, main="SchemaAnalyst Parameters Regression Tree",
 			sub=paste0("Schema: ",schemaName,", Generator: ", generatorName))
 		text(mutScoreFit, use.n=TRUE, all=TRUE, cex=.8)
 		dev.off() # close open PDF file

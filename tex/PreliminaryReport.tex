@@ -4,6 +4,7 @@
 \usepackage[utf8x]{inputenc}
 \usepackage{amsmath}
 \usepackage{graphicx}
+\usepackage{hyperref}
 \usepackage[colorinlistoftodos]{todonotes}
 
 \title{Optimizing SchemaAnalyst Parameter Usage with \texttt{SPOT}}
@@ -62,11 +63,35 @@ From here, \texttt{SPOT} proceeds as described in Section~\ref{sec:SPOT} and in 
 
 \section{Preliminary Analysis of Results}
 
+In our first round of comprehensive data collection and analysis, we ran our experiment with $8$ different schemas of varying complexity (listed in~\nameref{appA}), for each using both \texttt{alternatingValue} and \texttt{alternatingValueDefaults} generators. Before proceeding to analysis, we removed result sets in which every parameter configuration resulted in a mutation score of $1$---at the time being, these data sets obstruct the function of our analysis tools (the use of \texttt{RandomForest}, in particular).
 
+% TODO: add citation to compute.es documentation to show how effect size is calculated here
+The most general measure of the result sets is the \textit{effect size}, a measure of the strength of the relationship between the mutation scores generated using default parameter values and those generated using optimal parameter configurations determined by \texttt{SPOT} experimentation. For our set of $11$ result sets, the computed Cohen's $d$ value is $0.69$, indicating that there is a strong positive correlation between using optimized parameter values and receiving a higher mutation score.
 
+A similarly broad analysis measures the relative importance of each parameter that is being optimized (refer to~\nameref{sec:exp-des} for parameter descriptions).
+
+\begin{figure}[t]
+\includegraphics[scale=0.25]{mutation-score-importance.ps}
+\end{figure}
 
 \bibliographystyle{acm}
 \bibliography{references}
+
+\pagebreak
+
+\section*{Appendix A} \label{appA}
+\textit{Listing of schemas tested for preliminary analysis}
+\begin{itemize}
+\item \texttt{Flights}
+\item \texttt{JWhoisServer}
+\item \texttt{NistDML181}
+\item \texttt{NistDML181NotNulls}
+\item \texttt{NistDML182}
+\item \texttt{NistDML182NotNulls}
+\item \texttt{NistDML183}
+\item \texttt{UnixUsage}
+\end{itemize}
+
 \end{document}
 
 

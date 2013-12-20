@@ -65,14 +65,33 @@ From here, \texttt{SPOT} proceeds as described in Section~\ref{sec:SPOT} and in 
 
 In our first round of comprehensive data collection and analysis, we ran our experiment with $8$ different schemas of varying complexity (listed in~\nameref{appA}), for each using both \texttt{alternatingValue} and \texttt{alternatingValueDefaults} generators. Before proceeding to analysis, we removed result sets in which every parameter configuration resulted in a mutation score of $1$---at the time being, these data sets obstruct the function of our analysis tools (the use of \texttt{RandomForest}, in particular).
 
-% TODO: add citation to compute.es documentation to show how effect size is calculated here
-The most general measure of the result sets is the \textit{effect size}, a measure of the strength of the relationship between the mutation scores generated using default parameter values and those generated using optimal parameter configurations determined by \texttt{SPOT} experimentation. For our set of $11$ result sets, the computed Cohen's $d$ value is $0.69$, indicating that there is a strong positive correlation between using optimized parameter values and receiving a higher mutation score.
-
-A similarly broad analysis measures the relative importance of each parameter that is being optimized (refer to~\nameref{sec:exp-des} for parameter descriptions).
+%TODO add citation to compute.es documentation to show how effect size is calculated here
+The most general measure of the result sets is the \textit{effect size}, a measure of the strength of the relationship between the mutation scores generated using default parameter values and those generated using optimal parameter configurations determined by \texttt{SPOT} experimentation. For our set of $12$ result sets, the computed Cohen's $d$ value is $0.76$, indicating that there is a relatively strong positive correlation between using optimized parameter values and getting a higher mutation score.
 
 \begin{figure}[t]
-\includegraphics[scale=0.25]{mutation-score-importance.ps}
+\begin{center}
+%TODO generate graphics specifically for use in the LaTeX document that are easier to see, sans title
+\includegraphics[width=0.90\columnwidth]{mutation-score-importance.pdf}
+\caption{Parameter importance on mutation score}
+\end{center}
+\label{fig:mut-param-imp}
 \end{figure}
+
+A similarly broad analysis measures the relative importance of each parameter that is being optimized (refer to~\nameref{sec:exp-des} for parameter descriptions) relative to one of the optimization targets. For instance, Figure~\ref{fig:mut-param-imp} shows that \texttt{SatisfyRows} has the greatest effect on the mutation score, with \texttt{RandomSeed} placing as next most important. This result is reasonable, since a larger number of satisfying database interactions would tailor the set of statements $D$ more closely to the original schema $S$. Then, when $S$ is mutated to form $S'$, at least one of the statements well-suited to $S$ is likely not to be well-suited to $S'$, especially in the case when complex constraints are modified to form $S'$. Likewise, the minimal importance of $NegateRows$ follows since statements that violate $S$ would require that the precise constraint(s) that they violate be modified in the formation of $S'$; this is unlikely, so having a large number of negating interactions is unhelpful to killing mutant schemas, since they're unlikely to be accepted by any schema related to $S$.
+
+%TODO add similar analysis to above for generation-time-importance.pdf
+
+\begin{figure}[t]
+\begin{center}
+%TODO generate graphics specifically for use in the LaTeX document that are easier to see, sans title
+\includegraphics[width=0.90\columnwidth]{NistDML183-regressiontree.pdf}
+\caption{Regression tree for NistDML183}
+\end{center}
+\label{fig:CART}
+\end{figure}
+
+We can apply these broad results to analysis of a single result set as well. We see in Figure~\ref{fig:CART} that the first two branches of the classification tree depend on the value of \texttt{SatisfyRows}, again indicative of its correlation to the resultant mutation score; in this case, setting \texttt{SatisfyRows} to $9$ or greater is likely to ensure that the mutation score is near its optimal value in this result set.
+
 
 \bibliographystyle{acm}
 \bibliography{references}

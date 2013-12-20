@@ -1,0 +1,41 @@
+    EFFECT SIZE CALCULATION (FOR SINGLE INPUT)
+
+Mean Differences ES: 
+ 
+ d [ 95 %CI] = 0.76 [ -0.12 , 1.64 ] 
+  var(d) = 0.18 
+  p-value(d) = 0.09 
+  U3(d) = 77.62 % 
+  CLES(d) = 70.43 % 
+  Cliff's Delta = 0.41 
+ 
+ g [ 95 %CI] = 0.73 [ -0.11 , 1.58 ] 
+  var(g) = 0.17 
+  p-value(g) = 0.09 
+  U3(g) = 76.83 % 
+  CLES(g) = 69.79 % 
+ 
+ Correlation ES: 
+ 
+ r [ 95 %CI] = 0.35 [ -0.08 , 0.68 ] 
+  var(r) = 0.03 
+  p-value(r) = 0.1 
+ 
+ z [ 95 %CI] = 0.37 [ -0.08 , 0.82 ] 
+  var(z) = 0.05 
+  p-value(z) = 0.1 
+ 
+ Odds Ratio ES: 
+ 
+ OR [ 95 %CI] = 3.96 [ 0.81 , 19.44 ] 
+  p-value(OR) = 0.09 
+ 
+ Log OR [ 95 %CI] = 1.38 [ -0.21 , 2.97 ] 
+  var(lOR) = 0.59 
+  p-value(Log OR) = 0.09 
+ 
+ Other: 
+ 
+ NNT = 2.45 
+ Total N = 24NULL
+
